@@ -1,23 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>github-api-autocomplete</title>
     <link href="styles.css" rel="stylesheet" />
-</head>
+  </head>
 
-<body id="autocomplete">
+  <body id="autocomplete">
     <div class="search-bar">
-        <div class="search-bar__wrapper" id="search-bar__wrapper">
-            <input type="text" class="search-bar__input" id="search-bar" oninput="processChange()"
-                placeholder="Enter search query" name="search-bar" />
-        </div>
+      <div class="search-bar__wrapper" id="search-bar__wrapper">
+        <input
+          type="text"
+          class="search-bar__input"
+          id="search-bar"
+          oninput="processChange()"
+          placeholder="Enter search query"
+          name="search-bar"
+        />
+        <ul class="search-bar__list" id="search-bar__list"></ul>
+      </div>
     </div>
-    <div class="added-repos" id="added-repos">
-    </div>
-</body>
-<script src="main.js"></script>
-
+    <div class="added-repos" id="added-repos"></div>
+    <template id="repo__info-template">
+      <div class="info__block block">
+        <div class="block__label">Name:</div>
+        <div class="block__text"></div>
+      </div>
+      <div class="info__block block">
+        <div class="block__label">Owner:</div>
+        <div class="block__text"></div>
+      </div>
+      <div class="info__block block">
+        <div class="block__label">Stars:</div>
+        <div class="block__text"></div>
+      </div>
+    </template>
+  </body>
+  <script src="main.js"></script>
 </html>
