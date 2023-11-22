@@ -9,12 +9,8 @@ function debounce(fn, debounceTime = 500) {
   return result;
 }
 
-function capitalizeLetter(string) {
-  return string[0].toUpperCase() + string.slice(1);
-}
-
 function getVal() {
-  let query = document.getElementById("search-bar");
+  let query = app.query;
   const val = query.value;
   if (val.trimStart() !== "") {
     app.input = val.trimStart();
@@ -30,24 +26,22 @@ function getVal() {
 }
 
 async function getRepos(url) {
-  let repos;
-  let reposUnique;
-
-  if (url !== "") {
-    repos = await fetch(url);
-    reposUnique = await repos.json();
-  }
-
-  let menu = document.getElementsByTagName("li");
-  if (menu) {
-    for (var i = menu.length - 1; i >= 0; --i) {
-      menu[i].remove();
-    }
-  }
-
   if (url === "") {
     return;
   }
+  let repos;
+  let reposUnique;
+
+  try {
+    repos = await fetch(url);
+    reposUnique = await repos.json();
+  } catch (e) {
+    console.log(e.message);
+    alert("Something went wrong, exiting the search!");
+  }
+
+  let menu = document.querySelector("ul");
+  clearList(menu);
 
   if (reposUnique["items"]) {
     reposUnique["items"].forEach((object) => {
@@ -59,18 +53,20 @@ async function getRepos(url) {
       let text = document.createTextNode(name);
       newElement.appendChild(text);
       newElement.classList.add("search-bar__result");
-      document.getElementById("search-bar__wrapper").appendChild(newElement);
+      document.getElementById("search-bar__list").appendChild(newElement);
       newElement.addEventListener("click", () => {
         addRepos(name, owner, stars);
-        let query = document.getElementById("search-bar");
+        let query = app.query;
         query.value = "";
-        if (menu) {
-          for (var i = menu.length - 1; i >= 0; --i) {
-            menu[i].remove();
-          }
-        }
+        clearList(menu);
       });
     });
+  }
+}
+
+function clearList(ul) {
+  if (ul) {
+    ul.innerHTML = "";
   }
 }
 
@@ -91,34 +87,27 @@ function removeRepos(repo, button) {
 }
 
 function addRepos(name, owner, stars) {
-  let repos = document.getElementById("added-repos");
+  let repos = app.repos;
+  let template = app.template;
+
   let repo = document.createElement("div");
   repo.classList.add("repo");
 
   let repoInfo = document.createElement("div");
   repoInfo.classList.add("repo__info", "info");
+  repoInfo.append(template.content.cloneNode(true));
+
+  let divFields = repoInfo.getElementsByClassName("block__text");
 
   let args = [name, owner, stars];
-  let argsLabels = ["name", "owner", "stars"];
+  let i = 0;
 
   let button = addButton()();
   removeRepos(repo, button);
 
-  for (let i = 0; i < args.length; i++) {
-    let divField = document.createElement("div");
-    divField.classList.add(`info__${argsLabels[i]}`, `${argsLabels[i]}`);
-    let divLabel = document.createElement("div");
-    divLabel.classList.add(`${args[0]}__label`, `label`);
-    let text = document.createTextNode(`${capitalizeLetter(argsLabels[i])}: `);
-    divLabel.appendChild(text);
-    divField.appendChild(divLabel);
-    let divText = document.createElement("div");
-    text = document.createTextNode(`${args[i]}`);
-    divText.classList.add(`${argsLabels[i]}__text`);
-    divText.appendChild(text);
-    divField.appendChild(divText);
-    repoInfo.appendChild(divField);
-  }
+  Array.from(divFields).forEach((field) => {
+    field.appendChild(document.createTextNode(`${args[i++]}`));
+  });
 
   repo.appendChild(repoInfo);
   repo.appendChild(button);
@@ -134,6 +123,9 @@ class Search {
     this.app = document.getElementById("autocomplete");
     this.input = null;
     this.url = null;
+    this.query = document.getElementById("search-bar");
+    this.repos = document.getElementById("added-repos");
+    this.template = document.getElementById("repo__info-template");
   }
 }
 
