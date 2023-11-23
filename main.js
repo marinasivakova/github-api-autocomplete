@@ -71,14 +71,12 @@ function clearList(ul) {
 }
 
 function addButton() {
-  return function () {
     let button = document.createElement("button");
     button.classList.add("repo__remove");
     let buttonText = document.createTextNode("X");
     button.appendChild(buttonText);
     return button;
-  };
-}
+};
 
 function removeRepos(repo, button) {
   button.addEventListener("click", () => {
@@ -102,7 +100,7 @@ function addRepos(name, owner, stars) {
   let args = [name, owner, stars];
   let i = 0;
 
-  let button = addButton()();
+  let button = addButton();
   removeRepos(repo, button);
 
   Array.from(divFields).forEach((field) => {
